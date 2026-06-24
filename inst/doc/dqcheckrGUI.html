@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting started with dqcheckrGUI</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started with dqcheckrGUI</h1>
+
+
+
+<p><code>dqcheckrGUI</code> is a point-and-click Shiny interface for <a href="https://github.com/mickmioduszewski/dqcheckr">dqcheckr</a>. It
+lets you configure dataset quality checks, run them against incoming
+file deliveries, and browse historical results — without writing any R
+code.</p>
+<p>The app runs entirely on your local machine. No internet connection,
+no server, and no cloud services are required.</p>
+<div id="prerequisites" class="section level2">
+<h2>Prerequisites</h2>
+<p>Install <code>dqcheckr</code> before installing
+<code>dqcheckrGUI</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;dqcheckr&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;mickmioduszewski/dqcheckrGUI&quot;</span>)</span></code></pre></div>
+</div>
+<div id="launching-the-app" class="section level2">
+<h2>Launching the app</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>dqcheckrGUI<span class="sc">::</span><span class="fu">run_app</span>()</span></code></pre></div>
+<p>The app opens in your default browser at
+<code>http://localhost:4321</code>. It reads and writes files relative
+to the working directory you launched from, so set that to your project
+folder before calling <code>run_app()</code>. The terminal window must
+remain open while the app is running — closing it stops the app.</p>
+<p>Alternatively, double-click <code>launch.command</code> (macOS),
+<code>launch.sh</code> (Linux), or <code>launch.bat</code> (Windows)
+from the app directory.</p>
+<div id="first-run-setup" class="section level3">
+<h3>First-run setup</h3>
+<p>On first launch, if no <code>dqcheckr.yml</code> global config file
+exists in the working directory, the app opens directly to
+<strong>Global Config</strong> and prompts you to set two paths before
+doing anything else:</p>
+<ul>
+<li><strong>Snapshot database</strong> — where run summaries are stored
+(e.g. <code>data/snapshots.sqlite</code>)</li>
+<li><strong>Report output directory</strong> — where HTML reports are
+written (e.g. <code>reports/</code>)</li>
+</ul>
+<p>Click <strong>Save global config</strong> once these are set, then
+proceed to configure your first dataset.</p>
+</div>
+<div id="example-configuration-files" class="section level3">
+<h3>Example configuration files</h3>
+<p>Example YAML configuration files using the Star Wars dataset are
+included with the package. Copy them to get started quickly:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">file.copy</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">system.file</span>(<span class="st">&quot;extdata/example_config&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dqcheckrGUI&quot;</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="st">&quot;config&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="the-interface" class="section level2">
+<h2>The interface</h2>
+<p>The app has a fixed sidebar on the left and a main panel that changes
+based on your selection.</p>
+<pre><code>┌──────────────────┬────────────────────────────────┐
+│  SIDEBAR         │  MAIN PANEL                    │
+│                  │                                │
+│  Datasets        │  [content changes here]        │
+│    customers ✓   │                                │
+│    suppliers ⚠   │                                │
+│    [+ New]       │                                │
+│                  │                                │
+│  ▶ Run           │                                │
+│  ⏱ History       │                                │
+│  ⚙ Global Config │                                │
+└──────────────────┴────────────────────────────────┘</code></pre>
+<div id="status-badges" class="section level3">
+<h3>Status badges</h3>
+<p>Status badges appear in the sidebar, dataset panel, and history
+table:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Badge</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>✓ PASS</td>
+<td>All checks passed</td>
+</tr>
+<tr class="even">
+<td>⚠ WARN</td>
+<td>One or more warnings; no failures</td>
+</tr>
+<tr class="odd">
+<td>✗ FAIL</td>
+<td>One or more checks failed</td>
+</tr>
+<tr class="even">
+<td>● RUNNING</td>
+<td>A check is currently in progress</td>
+</tr>
+<tr class="odd">
+<td>— not run</td>
+<td>No runs recorded yet</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="dataset-panel" class="section level2">
+<h2>Dataset panel</h2>
+<p>Clicking a dataset name in the sidebar opens its <strong>Dataset
+panel</strong> in the main area:</p>
+<pre><code>customer_accounts
+──────────────────────────────────────────
+Format: CSV   Location: data/incoming/
+Config: config/customer_accounts.yml
+
+[Edit config]          [Run check ▶]
+
+Recent runs (last 5):
+  2026-05-30   20260530.csv   ✓ PASS   0 failures
+  2026-05-23   20260523.csv   ⚠ WARN   0 failures
+  2026-05-16   20260516.csv   ✓ PASS   0 failures
+
+[View all in History →]
+
+Compare drift:  ☐ run 1  ☐ run 2   [Compare ▶]</code></pre>
+<ul>
+<li><strong>Edit config</strong> opens the 8-step wizard pre-populated
+with the existing settings.</li>
+<li><strong>Run check ▶</strong> navigates to the Run panel with this
+dataset pre-selected.</li>
+<li>Clicking any row in the recent runs table opens that run’s HTML
+report in a new browser tab.</li>
+<li><strong>Compare drift</strong> — tick two checkboxes from the recent
+runs table and click <strong>Compare ▶</strong> to produce a drift
+report comparing those two deliveries.</li>
+</ul>
+<hr />
+</div>
+<div id="setting-up-a-dataset-the-8-step-wizard" class="section level2">
+<h2>Setting up a dataset — the 8-step wizard</h2>
+<p>Click <strong>+ New dataset</strong> in the sidebar to open the
+configuration wizard. Navigate between steps using the
+<strong>Back</strong> and <strong>Next</strong> buttons, or click the
+numbered breadcrumb bar at the top. All values are preserved as you move
+back and forth. If you navigate away from the wizard with unsaved
+changes, the app will warn you before discarding them.</p>
+<div id="step-1-dataset-identity" class="section level3">
+<h3>Step 1 — Dataset identity</h3>
+<p>Enter a short machine-readable name for the dataset. Names must start
+with a letter and contain only letters, numbers, and underscores (e.g.
+<code>customer_accounts</code>). This name is used as the config
+filename and passed directly to
+<code>dqcheckr::run_dq_check()</code>.</p>
+<p>An optional free-text description can also be added.</p>
+</div>
+<div id="step-2-file-location" class="section level3">
+<h3>Step 2 — File location</h3>
+<p>Choose how files are identified for each run:</p>
+<p><strong>Folder scan (recommended)</strong> — point to a folder; the
+app picks the two most recently modified files automatically on each
+run. Use this for delivery processes that drop files into a fixed
+directory.</p>
+<p>A <strong>Preview most recent file</strong> button shows the names
+and sizes of the two most recent files in the selected folder:
+<em>“Current: 20260530.csv (2.4 MB) | Previous: 20260523.csv (2.3
+MB)”</em>.</p>
+<p><strong>Explicit file paths</strong> — list a current file and
+optionally a previous file by path. Useful when files are versioned by
+name. If no previous file is given, comparison checks (CP series) are
+skipped.</p>
+</div>
+<div id="step-3-format-and-structure" class="section level3">
+<h3>Step 3 — Format and structure</h3>
+<p>This step identifies the file’s format and column layout. The top of
+the screen shows a raw text preview of the first 50 lines of the file —
+the full file is never loaded.</p>
+<p><strong>Auto-detection</strong>: when a file is loaded, the app uses
+<code>readr</code> to detect the delimiter, encoding, quote character,
+and whether the first row is a header. Results are shown as an editable
+confirmation panel — you always make the final call, nothing is silently
+committed.</p>
+<div id="csv-files" class="section level4">
+<h4>CSV files</h4>
+<p>Confirm or adjust:</p>
+<ul>
+<li><strong>Format</strong> (CSV or Fixed-Width)</li>
+<li><strong>Delimiter</strong> — comma, tab, semicolon, pipe, space,
+colon, or custom</li>
+<li><strong>Encoding</strong> — detected candidates are shown with
+confidence percentages</li>
+<li><strong>Quote character</strong></li>
+<li><strong>Header row</strong> — whether the first row contains column
+names</li>
+</ul>
+<p>A parsed preview updates live as you change these settings. If there
+is no header row, a column-naming panel appears alongside the preview
+where you can enter names for each column. Names must be valid R
+identifiers; a suggestion is offered if you enter something invalid.</p>
+</div>
+<div id="fixed-width-fwf-files" class="section level4">
+<h4>Fixed-width (FWF) files</h4>
+<p>When FWF is selected, a <strong>visual ruler</strong> activates above
+the text preview.</p>
+<ul>
+<li><strong>Click</strong> anywhere in the text to place a column
+boundary at that character position.</li>
+<li><strong>Drag</strong> a boundary line left or right to adjust it —
+it snaps to character boundaries.</li>
+<li><strong>Double-click</strong> a boundary line to remove it.</li>
+<li>An <strong>Auto-detect</strong> button attempts automatic boundary
+detection using <code>readr::fwf_empty()</code>.</li>
+</ul>
+<p>Below the ruler, a table shows the resulting column definitions
+(start position, width, name, type). Edit column names and types here. A
+validation badge confirms whether the column widths account for the full
+record length:</p>
+<ul>
+<li>✅ green — widths match the line length exactly</li>
+<li>⚠ amber — widths cover fewer characters than the line length
+(trailing columns unaccounted for)</li>
+<li>✗ red — widths exceed the line length (Next is disabled until
+fixed)</li>
+</ul>
+<p>If the file has header rows to skip before the data begins, set
+<strong>Header rows to skip</strong>. Column names are pre-populated
+from the skipped header row if one is present.</p>
+</div>
+</div>
+<div id="step-4-column-classification" class="section level3">
+<h3>Step 4 — Column classification</h3>
+<p>Review every detected column. For each column you can:</p>
+<ul>
+<li><strong>Set a type override</strong> — force a column to be treated
+as <code>character</code> even if it looks numeric. Use this for
+postcodes, phone numbers, account codes, BSB numbers, or any identifier
+that happens to contain only digits. Click the inferred type to open the
+override dropdown.</li>
+<li><strong>Mark as key column</strong> — that column will be checked
+for uniqueness (QC-12).</li>
+<li><strong>Mark as expected</strong> — columns not present in a
+delivery will raise a schema warning (SC-01). All columns are expected
+by default; use <strong>Select none</strong> to clear all and tick only
+the columns that must always be present.</li>
+</ul>
+</div>
+<div id="step-5-column-rules" class="section level3">
+<h3>Step 5 — Column rules</h3>
+<p>Each column is shown as a collapsible card. Expand a column to add
+optional per-column validation rules.</p>
+<p><strong>Standard rules</strong> (always visible):</p>
+<table>
+<colgroup>
+<col width="24%" />
+<col width="48%" />
+<col width="28%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rule</th>
+<th>Applies to</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Allowed values</td>
+<td>character columns</td>
+<td>QC-09: flag any value not in the list</td>
+</tr>
+<tr class="even">
+<td>Min value</td>
+<td>numeric columns</td>
+<td>QC-10: flag values below the minimum</td>
+</tr>
+<tr class="odd">
+<td>Max value</td>
+<td>numeric columns</td>
+<td>QC-10: flag values above the maximum</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Advanced rules</strong> (click <strong>Advanced ▼</strong> to
+reveal):</p>
+<table>
+<colgroup>
+<col width="31%" />
+<col width="68%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Regex pattern</td>
+<td>Flag values that do not match the pattern (QC-13). Click
+<strong>Test against sample</strong> to verify the pattern against the
+actual file before saving.</td>
+</tr>
+<tr class="even">
+<td>Max missing rate</td>
+<td>Override the dataset-level threshold for this column only</td>
+</tr>
+<tr class="odd">
+<td>Max non-numeric rate</td>
+<td>Override for numeric columns only</td>
+</tr>
+<tr class="even">
+<td>Max missing rate change</td>
+<td>Override the comparison threshold for this column</td>
+</tr>
+<tr class="odd">
+<td>Max mean shift</td>
+<td>Override the mean shift threshold for this column</td>
+</tr>
+</tbody>
+</table>
+<p>A regex syntax error disables <strong>Next</strong>; a pattern that
+fails against sample values shows a warning but does not block you from
+proceeding.</p>
+</div>
+<div id="step-6-rule-overrides" class="section level3">
+<h3>Step 6 — Rule overrides</h3>
+<p>Override the global default thresholds for this dataset only. Each
+field is pre-filled with the current global default. Only fields whose
+value differs from the global default are written to the dataset config;
+fields left at their default are omitted so that a later change to the
+global config is automatically inherited.</p>
+<table>
+<colgroup>
+<col width="29%" />
+<col width="24%" />
+<col width="45%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threshold</th>
+<th>Default</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Max missing rate</td>
+<td>0.05</td>
+<td>Flag a column if &gt; 5 % of values are blank</td>
+</tr>
+<tr class="even">
+<td>Max non-numeric rate</td>
+<td>0.01</td>
+<td>Flag a numeric column if &gt; 1 % of values cannot be parsed</td>
+</tr>
+<tr class="odd">
+<td>Min row count</td>
+<td>0 (off)</td>
+<td>Fail if the delivery has fewer rows than this</td>
+</tr>
+<tr class="even">
+<td>Max row count change</td>
+<td>10 %</td>
+<td>Warn if row count changes by &gt; 10 % vs previous delivery</td>
+</tr>
+<tr class="odd">
+<td>Max mean shift</td>
+<td>20 %</td>
+<td>Warn if a numeric column mean shifts by &gt; 20 %</td>
+</tr>
+<tr class="even">
+<td>Max missing change</td>
+<td>2 pp</td>
+<td>Warn if missing rate changes by &gt; 2 percentage points</td>
+</tr>
+<tr class="odd">
+<td>Max non-numeric change</td>
+<td>1 pp</td>
+<td>Warn if non-numeric rate changes by &gt; 1 percentage point</td>
+</tr>
+<tr class="even">
+<td>Type inference threshold</td>
+<td>0.90</td>
+<td>A column is typed numeric if ≥ 90 % of values parse as numbers</td>
+</tr>
+</tbody>
+</table>
+<p>Schema change flags control whether warnings are raised when columns
+are added, dropped, change type, or change order between deliveries.</p>
+</div>
+<div id="step-7-custom-checks-optional" class="section level3">
+<h3>Step 7 — Custom checks (optional)</h3>
+<p>Point to a plain R file that defines a <code>custom_checks(df)</code>
+function. The app validates the file immediately: it checks that the
+file exists, parses without syntax errors, and defines the expected
+function. A green badge confirms a valid file; a red badge shows the
+specific problem.</p>
+<p>Leave this field blank to skip custom checks. See
+<code>vignette(&quot;dqcheckr&quot;, package = &quot;dqcheckr&quot;)</code> for the custom
+checks function signature and return value.</p>
+</div>
+<div id="step-8-review-and-save" class="section level3">
+<h3>Step 8 — Review and save</h3>
+<p>A summary of all settings is shown alongside a YAML preview of the
+configuration that will be written. Click <strong>Save config ✓</strong>
+to write the file. A success notification confirms the path. The app
+then navigates to the dataset panel for the saved dataset.</p>
+<p><strong>For analysts who hand-edit YAML</strong>: the app preserves
+any keys you have added to the YAML file outside the wizard. On the next
+edit, those keys appear in the Step 8 preview under
+<code># preserved from original file</code> and are written back
+unchanged. The wizard never silently drops hand-added config keys.</p>
+<hr />
+</div>
+</div>
+<div id="running-a-quality-check" class="section level2">
+<h2>Running a quality check</h2>
+<p>Click <strong>▶ Run</strong> in the sidebar (or <strong>Run check
+▶</strong> from a dataset panel).</p>
+<ol style="list-style-type: decimal">
+<li>Select a dataset from the dropdown.</li>
+<li>The app validates the config before enabling the run button — it
+checks that the config file is readable, the data folder or files exist,
+and the output paths are writable. Any problem is shown as a red badge
+with the specific issue.</li>
+<li>Click <strong>▶ Run check</strong>.</li>
+</ol>
+<p>The check runs in a background process so the UI stays responsive.
+Progress is streamed to the log area in real time. When complete:</p>
+<pre><code>Status: ✓ PASS    [Open report ↗]   [View log]
+
+  0 failures   0 warnings   22 passed
+  Report: reports/customer_accounts_20260531_143022.html</code></pre>
+<ul>
+<li><strong>Open report ↗</strong> opens the HTML report in the system
+browser.</li>
+<li><strong>View log</strong> shows the full run log in a dialog
+box.</li>
+<li><strong>■ Stop</strong> (shown during a run) cancels the background
+process. A confirmation is shown first, noting that the snapshot will
+not be written if the run has not completed.</li>
+</ul>
+<hr />
+</div>
+<div id="browsing-history" class="section level2">
+<h2>Browsing history</h2>
+<p>Click <strong>⏱ History</strong> in the sidebar to see all past runs
+across all datasets.</p>
+<p>The table can be filtered by dataset name, status, or date using the
+filter row at the top of each column. Click <strong>Load more</strong>
+to page through older runs.</p>
+<p><strong>To open a report</strong>: click the <strong>Open</strong>
+link in the Report column to open that run’s HTML report in a new
+browser tab.</p>
+<p><strong>To compare two deliveries</strong>:</p>
+<ol style="list-style-type: decimal">
+<li>Tick the checkbox next to exactly two runs <strong>from the same
+dataset</strong>.</li>
+<li>Click <strong>Compare drift ▶</strong>.</li>
+</ol>
+<p>The drift report opens in a new tab, showing column-by-column changes
+between the two snapshots. The button is disabled with a tooltip if the
+selected rows are from different datasets.</p>
+<hr />
+</div>
+<div id="global-configuration" class="section level2">
+<h2>Global configuration</h2>
+<p>Click <strong>⚙ Global Config</strong> to set defaults that apply to
+all datasets unless overridden at the dataset level (Step 6).</p>
+<p><strong>Infrastructure paths</strong> — set the snapshot database
+path and report output directory. The snapshot database is created
+automatically on first run if it does not exist. If either path’s parent
+directory does not exist, a red validation message is shown — create the
+directory on disk first, then save.</p>
+<p><strong>Default rule thresholds</strong> — the same thresholds
+described in Step 6 above, applied globally. Dataset-level overrides
+take precedence.</p>
+<p>Click <strong>Save global config</strong> to write changes.</p>
+<div id="team-use-via-a-shared-network-drive" class="section level3">
+<h3>Team use via a shared network drive</h3>
+<p>Multiple users can share the same configuration and run history by
+pointing their <code>config_dir</code> and snapshot database paths at a
+shared network folder. Each user runs the app locally; the shared drive
+holds the YAML configs and the SQLite snapshot database. Set these paths
+in Global Config on each user’s machine. SQLite handles concurrent reads
+safely; two simultaneous writes (unlikely in practice) are serialised by
+file locking.</p>
+<hr />
+</div>
+</div>
+<div id="learn-more" class="section level2">
+<h2>Learn more</h2>
+<p>See <code>vignette(&quot;dqcheckr&quot;, package = &quot;dqcheckr&quot;)</code> for a
+full description of every quality check (QC-01 to QC-14, SC-01/02, CP-01
+to CP-08), per-column configuration options, custom checks, snapshot
+database schema, and the <code>compare_snapshots()</code> function used
+for drift reports.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
