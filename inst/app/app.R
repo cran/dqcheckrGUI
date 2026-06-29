@@ -199,16 +199,65 @@ shinyApp(
     server_run(input, output, session, rv, config_dir, gcfg_rv)
     server_history(input, output, session, rv, config_dir, gcfg_rv)
 
-    # ── First-run: open global config if no dqcheckr.yml ───────────
+    # ── First-run: offer to scaffold project directories + config ───
     observe({
       cfg_path <- global_config_path(config_dir())
       if (!safe_file_exists(cfg_path)) {
-        rv$active_section <- "global"
-        showNotification(
-          "Welcome! Please configure the infrastructure paths below to get started.",
-          type="message", duration=6
-        )
+        root <- deployment_root(config_dir())
+        showModal(modalDialog(
+          title = "New project",
+          p("No configuration found at:"),
+          tags$code(cfg_path),
+          p(class = "mt-2",
+            "Create the standard project layout (",
+            tags$code("config/"), ", ", tags$code("data/"), ", ",
+            tags$code("reports/"), ") here?"),
+          tags$code(root),
+          footer = tagList(
+            modalButton("No, I'll set it up manually"),
+            actionButton("init_project_confirm", "Yes, create project",
+                         class = "btn btn-primary")
+          )
+        ))
       }
+    })
+
+    observeEvent(input$init_project_confirm, {
+      removeModal()
+      root <- deployment_root(config_dir())
+      cd   <- config_dir()
+      tryCatch({
+        dir.create(cd,                        showWarnings = FALSE, recursive = TRUE)
+        dir.create(file.path(root, "data"),    showWarnings = FALSE)
+        dir.create(file.path(root, "reports"), showWarnings = FALSE)
+        default_cfg <- list(
+          snapshot_db       = "data/snapshots.sqlite",
+          report_output_dir = "reports/",
+          default_rules     = list(
+            type_inference_threshold       = 0.90,
+            max_missing_rate               = 0.05,
+            max_non_numeric_rate           = 0.01,
+            min_row_count                  = 0L,
+            max_row_count_change_pct       = 0.10,
+            max_numeric_mean_shift_pct     = 0.20,
+            max_missing_rate_change_pp     = 2.0,
+            max_non_numeric_rate_change_pp = 1.0,
+            flag_new_columns               = TRUE,
+            flag_dropped_columns           = TRUE,
+            flag_type_changes              = TRUE,
+            flag_column_order_change       = TRUE
+          )
+        )
+        yaml::write_yaml(default_cfg, global_config_path(cd))
+        gcfg_rv(read_global_config(global_config_path(cd)))
+        register_report_resource_path(default_cfg$report_output_dir, cd)
+        rv$active_section <- "global"
+        showNotification("Project created. Review the settings below.",
+                         type = "message", duration = 5)
+      }, error = function(e) {
+        showNotification(paste("Could not create project:", conditionMessage(e)),
+                         type = "error", duration = 10)
+      })
     })
 
   }

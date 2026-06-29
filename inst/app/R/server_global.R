@@ -2,7 +2,12 @@
 
 server_global <- function(input, output, session, rv, config_dir, gcfg_rv) {
 
-  roots <- c(Home=path.expand("~"), WD=getwd())
+  # shinyFiles 0.9.3 bug: roots must be a plain named vector (see server_wizard.R).
+  roots <- c(
+    Project = deployment_root(isolate(config_dir())),
+    Home    = path.expand("~"),
+    shinyFiles::getVolumes()()
+  )
 
   shinyFiles::shinyFileChoose(input, "gcfg_db_browse",
     roots=roots, session=session)
@@ -21,16 +26,18 @@ server_global <- function(input, output, session, rv, config_dir, gcfg_rv) {
     if (length(p) > 0) updateTextInput(session, "gcfg_report_dir", value=as.character(p[1]))
   })
 
-  # Validation
+  # Validation — resolve relative paths against deployment root so that
+  # relative values like "data/snapshots.sqlite" validate correctly.
   iv_gcfg <- shinyvalidate::InputValidator$new()
   iv_gcfg$add_rule("gcfg_snapshot_db", function(v) {
     if (is.null(v) || !is.character(v) || nchar(v) == 0) return(NULL)
-    parent <- dirname(v)
+    parent <- dirname(resolve_infra_path(v, config_dir()))
     if (!safe_dir_exists(parent)) sprintf("Directory not found: %s", parent)
   })
   iv_gcfg$add_rule("gcfg_report_dir", function(v) {
     if (is.null(v) || !is.character(v) || nchar(v) == 0) return(NULL)
-    if (!safe_dir_exists(v)) "Directory not found. Create it first or change path."
+    if (!safe_dir_exists(resolve_infra_path(v, config_dir())))
+      "Directory not found. Create it first or change path."
   })
   iv_gcfg$enable()
 
@@ -38,7 +45,7 @@ server_global <- function(input, output, session, rv, config_dir, gcfg_rv) {
   output$sv_gcfg_snapshot_db <- renderUI({
     v <- input$gcfg_snapshot_db
     if (is.null(v) || nchar(v) == 0) return(NULL)
-    parent <- dirname(v)
+    parent <- dirname(resolve_infra_path(v, config_dir()))
     if (!safe_dir_exists(parent))
       tags$div(class="text-danger", style="font-size:12px;",
                sprintf("Directory not found: %s", parent))
@@ -46,7 +53,7 @@ server_global <- function(input, output, session, rv, config_dir, gcfg_rv) {
   output$sv_gcfg_report_dir <- renderUI({
     v <- input$gcfg_report_dir
     if (is.null(v) || nchar(v) == 0) return(NULL)
-    if (!safe_dir_exists(v))
+    if (!safe_dir_exists(resolve_infra_path(v, config_dir())))
       tags$div(class="text-danger", style="font-size:12px;",
                "Directory not found. Create it first or change path.")
   })

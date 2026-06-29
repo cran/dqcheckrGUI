@@ -148,7 +148,6 @@ server_wizard <- function(input, output, session, rv, config_dir, gcfg_rv) {
   # told to reattach (and redraw any previously-placed boundaries) every
   # time we land on step 3, not just when advancing into it from step 2.
   enter_fwf_step3 <- function() {
-    output$fwf_char_ruler_text <- renderText({ wiz$ruler_string })
     positions <- if (length(wiz$fwf_starts) > 0)
       as.list(as.integer(wiz$fwf_starts) - 1L) else list()
     session$sendCustomMessage("fwf_reinit", list(positions = positions))
@@ -188,7 +187,16 @@ server_wizard <- function(input, output, session, rv, config_dir, gcfg_rv) {
   iv_step1$enable()
 
   # ── Step 2: File location ────────────────────────────────────────────
-  file_roots <- c(Home=path.expand("~"), WD=getwd())
+  # Roots for file/folder pickers: project root first (most useful), then
+  # home, then system volumes (gives drive letters on Windows).
+  # shinyFiles 0.9.3 bug: sendDirectoryData does `roots[name]` directly (not
+  # `roots()`), so roots must be a plain named vector, not a reactive/function.
+  # config_dir() is static for the session (reads from env var), so this is safe.
+  file_roots <- c(
+    Project = deployment_root(isolate(config_dir())),
+    Home    = path.expand("~"),
+    shinyFiles::getVolumes()()
+  )
 
   shinyFiles::shinyDirChoose(input, "wiz_folder_browse",
     roots=file_roots, session=session)
@@ -657,7 +665,10 @@ server_wizard <- function(input, output, session, rv, config_dir, gcfg_rv) {
       return(div(class="alert alert-danger p-1 mt-1", style="font-size:12px;",
                  paste("✗ R syntax error:", parse_err)))
     env <- new.env(parent=baseenv())
-    tryCatch(source(path, local=env), error=function(e) NULL)
+    src_err <- tryCatch({ source(path, local=env); NULL }, error=function(e) e)
+    if (!is.null(src_err))
+      return(div(class="alert alert-danger p-1 mt-1", style="font-size:12px;",
+                 paste("✗ Error sourcing file:", conditionMessage(src_err))))
     fn <- tryCatch(get("custom_checks", envir=env), error=function(e) NULL)
     if (is.null(fn) || !is.function(fn))
       return(div(class="alert alert-danger p-1 mt-1", style="font-size:12px;",

@@ -1,8 +1,8 @@
 Package: dqcheckrGUI
 Type: Package
 Title: Point-and-Click GUI Client for 'dqcheckr'
-Version: 0.1.0
-Date: 2026-06-18
+Version: 0.2.0
+Date: 2026-06-28
 Authors@R: person("Mick", "Mioduszewski",
                   email = "mick@mioduszewski.net",
                   role  = c("aut", "cre"))
@@ -12,7 +12,8 @@ Description:
     running them against recurring file deliveries, and browsing historical
     check results — without writing any R code.
 License: MIT + file LICENSE
-URL: https://github.com/mickmioduszewski/dqcheckrGUI
+URL: https://mickmioduszewski.github.io/dqcheckrGUI/,
+        https://github.com/mickmioduszewski/dqcheckrGUI
 BugReports: https://github.com/mickmioduszewski/dqcheckrGUI/issues
 Encoding: UTF-8
 Language: en-GB
@@ -20,13 +21,14 @@ Depends: R (>= 4.2)
 Imports: dqcheckr (>= 0.2.2), shiny, bslib, shinyvalidate, shinyFiles,
         shinyAce, reactable, DT, callr, yaml, readr, DBI, RSQLite,
         stats, tools
-Suggests: testthat (>= 3.1.0), knitr, rmarkdown, shinytest2, withr
+Suggests: testthat (>= 3.1.0), knitr, rmarkdown, shinytest2, withr,
+        pkgdown
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-06-18 20:36:58 UTC; mick
+Packaged: 2026-06-29 04:27:45 UTC; mick
 Author: Mick Mioduszewski [aut, cre]
 Maintainer: Mick Mioduszewski <mick@mioduszewski.net>
 Repository: CRAN
-Date/Publication: 2026-06-24 08:20:13 UTC
+Date/Publication: 2026-06-29 08:10:02 UTC

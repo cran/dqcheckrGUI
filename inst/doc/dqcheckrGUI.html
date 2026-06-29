@@ -357,38 +357,73 @@ no server, and no cloud services are required.</p>
 <div id="launching-the-app" class="section level2">
 <h2>Launching the app</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>dqcheckrGUI<span class="sc">::</span><span class="fu">run_app</span>()</span></code></pre></div>
-<p>The app opens in your default browser at
-<code>http://localhost:4321</code>. It reads and writes files relative
-to the working directory you launched from, so set that to your project
-folder before calling <code>run_app()</code>. The terminal window must
+<p>The app opens in your default browser. The terminal window must
 remain open while the app is running — closing it stops the app.</p>
-<p>Alternatively, double-click <code>launch.command</code> (macOS),
-<code>launch.sh</code> (Linux), or <code>launch.bat</code> (Windows)
-from the app directory.</p>
+<div id="pointing-the-app-at-your-project" class="section level3">
+<h3>Pointing the app at your project</h3>
+<p>The app needs to know which folder holds your <code>config/</code>,
+<code>data/</code>, and <code>reports/</code> directories. There are two
+ways to set this:</p>
+<p><strong>Option A — <code>config_dir</code> argument
+(recommended)</strong></p>
+<p>Pass the path to your project’s <code>config/</code> folder when
+launching. This works regardless of the R session’s working directory,
+which is important on Windows where the session directory may not match
+the script’s location.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># From a launcher script in the project folder:</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>dqcheckrGUI<span class="sc">::</span><span class="fu">run_app</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">config_dir =</span> <span class="fu">file.path</span>(<span class="fu">dirname</span>(rstudioapi<span class="sc">::</span><span class="fu">getSourceEditorContext</span>()<span class="sc">$</span>path), <span class="st">&quot;config&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>)</span></code></pre></div>
+<p><strong>Option B — environment variable</strong></p>
+<p>Set <code>DQCHECKR_CONFIG_DIR</code> before launching. Useful for
+shared or server-based deployments.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DQCHECKR_CONFIG_DIR =</span> <span class="st">&quot;/path/to/project/config&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>dqcheckrGUI<span class="sc">::</span><span class="fu">run_app</span>()</span></code></pre></div>
+<p>If neither is set, the app falls back to a <code>config/</code>
+subdirectory of the R session’s working directory — which may not be
+your project folder.</p>
+</div>
+<div id="windows-and-onedrive" class="section level3">
+<h3>Windows and OneDrive</h3>
+<p>On Windows, files are commonly stored in a OneDrive-synced folder
+with a long path such as:</p>
+<pre><code>C:/Users/username/OneDrive - Organisation/Documents/My Project/</code></pre>
+<p>Because the R session’s working directory may differ from the
+script’s location, always use the <code>config_dir</code> argument in
+your launcher script:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># run_dq.r — place this file in the project root</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">library</span>(dqcheckrGUI)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">setwd</span>(<span class="fu">dirname</span>(rstudioapi<span class="sc">::</span><span class="fu">getSourceEditorContext</span>()<span class="sc">$</span>path))</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">run_app</span>(<span class="at">config_dir =</span> <span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">&quot;config&quot;</span>))</span></code></pre></div>
+<p>This ensures the app resolves <code>data/</code>,
+<code>reports/</code>, and all relative dataset paths correctly
+regardless of the OneDrive path or the Windows username.</p>
+</div>
 <div id="first-run-setup" class="section level3">
 <h3>First-run setup</h3>
-<p>On first launch, if no <code>dqcheckr.yml</code> global config file
-exists in the working directory, the app opens directly to
-<strong>Global Config</strong> and prompts you to set two paths before
-doing anything else:</p>
-<ul>
-<li><strong>Snapshot database</strong> — where run summaries are stored
-(e.g. <code>data/snapshots.sqlite</code>)</li>
-<li><strong>Report output directory</strong> — where HTML reports are
-written (e.g. <code>reports/</code>)</li>
-</ul>
-<p>Click <strong>Save global config</strong> once these are set, then
-proceed to configure your first dataset.</p>
+<p>On first launch in an empty folder, the app shows a <strong>New
+project</strong> dialog:</p>
+<blockquote>
+<p><em>No configuration found. Create the standard project layout
+(config/, data/, reports/) here?</em></p>
+</blockquote>
+<p>Click <strong>Yes, create project</strong> to scaffold the
+directories and write a default <code>dqcheckr.yml</code>. The app then
+opens <strong>Global Config</strong> where you can review and adjust the
+default paths and thresholds before adding datasets.</p>
+<p>If you prefer to set up manually, click <strong>No, I’ll set it up
+manually</strong> and create the directories yourself before saving the
+global config.</p>
 </div>
 <div id="example-configuration-files" class="section level3">
 <h3>Example configuration files</h3>
 <p>Example YAML configuration files using the Star Wars dataset are
 included with the package. Copy them to get started quickly:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">file.copy</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">system.file</span>(<span class="st">&quot;extdata/example_config&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dqcheckrGUI&quot;</span>),</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="st">&quot;config&quot;</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">file.copy</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">system.file</span>(<span class="st">&quot;extdata/example_config&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dqcheckrGUI&quot;</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="st">&quot;config&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>)</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -830,11 +865,15 @@ file locking.</p>
 </div>
 <div id="learn-more" class="section level2">
 <h2>Learn more</h2>
-<p>See <code>vignette(&quot;dqcheckr&quot;, package = &quot;dqcheckr&quot;)</code> for a
-full description of every quality check (QC-01 to QC-14, SC-01/02, CP-01
-to CP-08), per-column configuration options, custom checks, snapshot
-database schema, and the <code>compare_snapshots()</code> function used
-for drift reports.</p>
+<p>The <code>dqcheckr</code> package provides two vignettes:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Core concepts, config keys, custom checks, and the run_dq_check() API:</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;dqcheckr&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">vignette</span>(<span class="st">&quot;dqcheckr&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dqcheckr&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co"># Full software specification — every check (QC-01 to QC-14, SC-01/02,</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co"># CP-01 to CP-08), snapshot schema, compare_snapshots(), and drift reports:</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;dqcheckr&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="fu">vignette</span>(<span class="st">&quot;specification&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dqcheckr&quot;</span>)</span></code></pre></div>
 </div>
 
 
